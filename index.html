@@ -4,82 +4,126 @@
   <meta charset="UTF-8">
   <title>Check List Estacionamientos - AccessOne</title>
   <style>
+    /* Colores corporativos */
     :root {
-      --purple: #2E0060;
-      --yellow: #FFD400;
-      --gray-light: #f9f9f9;
-      --gray-medium: #e0e0e0;
-      --gray-dark: #ccc;
+      --primary: #2E0060;
+      --secondary: #FFD400;
+      --bg-light: #f9f9f9;
+      --bg-white: #ffffff;
+      --gray: #e0e0e0;
+      --text: #333333;
     }
-    body { background: var(--gray-light); font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-    .header { display: flex; align-items: center; background: var(--purple); color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; }
-    .header img { height: 40px; margin-right: 15px; }
-    .header h1 { font-size: 1.5em; margin: 0; }
-    .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; }
-    .form-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
-    .form-header label { font-weight: bold; color: var(--purple); }
-    .form-header input { border: 1px solid var(--gray-dark); border-radius: 4px; padding: 4px; margin-left: 8px; }
-    #progressContainer { background: var(--gray-medium); border-radius: 4px; overflow: hidden; margin-bottom: 10px; height: 12px; }
-    #progressBar { height: 100%; width: 0%; background: var(--yellow); transition: width .3s; }
-    #totalCalif { font-size: 1.1em; margin-bottom: 15px; color: var(--purple); }
-    #totalValue { font-weight: bold; font-size: 1.3em; }
-
-    .section-details { margin-bottom: 20px; border: 1px solid var(--gray-medium); border-radius: 4px; overflow: hidden; }
-    .section-details summary { background: var(--gray-medium); padding: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; color: var(--purple); }
-    table { width: 100%; border-collapse: collapse; margin: 0; }
-    th, td { border: 1px solid var(--gray-dark); padding: 8px; vertical-align: top; }
-    th { background: var(--gray-light); text-align: left; }
-    .item-col { width: 30%; font-weight: bold; color: var(--purple); }
-    .comment-col { width: 50%; }
-    textarea { width: 100%; min-height: 3em; border: 1px solid var(--gray-dark); border-radius: 4px; padding: 6px; resize: vertical; }
-    .char-count { font-size: .8em; color: var(--gray-dark); text-align: right; margin-top: 2px; }
-    .ok-col { width: 20%; text-align: center; }
-    .ok-options label { margin: 0 5px; cursor: pointer; }
-    .ok-options input { transform: scale(1.2); margin-right: 4px; vertical-align: middle; }
-
-    .signatures {
-      margin-top: 80px;
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg-light);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      color: var(--text);
+    }
+    .container {
+      max-width: 1400px;
+      margin: auto;
+      padding: 20px;
+    }
+    header {
       display: flex;
-      justify-content: center;
-      gap: 40px;
+      align-items: center;
+      background: linear-gradient(90deg, var(--primary), #4b0082);
+      color: var(--bg-white);
+      padding: 15px 30px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .signature-line {
-      width: 40%;
-      border-top: 1px solid var(--gray-dark);
-      padding-top: 60px;
+    header img { height: 50px; margin-right: 20px; }
+    header h1 { font-size: 1.8em; letter-spacing: 1px; margin: 0; }
+    .card {
+      background: var(--bg-white);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 30px;
+    }
+    .form-header {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .form-header label {
+      flex: 1;
+      min-width: 200px;
       font-weight: bold;
-      color: var(--purple);
+      color: var(--primary);
+    }
+    .form-header input {
+      width: 100%;
+      border: 1px solid var(--gray);
+      border-radius: 4px;
+      padding: 6px 10px;
+      margin-top: 5px;
+    }
+    #progressContainer { background: var(--gray); border-radius: 4px; overflow: hidden; margin-bottom: 15px; height: 14px; }
+    #progressBar { height: 100%; width: 0%; background: var(--secondary); transition: width 0.4s ease; }
+    #totalCalif { font-size: 1.2em; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    #totalValue { font-weight: bold; font-size: 1.5em; }
+    .section-details { margin-bottom: 15px; border: 1px solid var(--gray); border-radius: 6px; overflow: hidden; }
+    .section-details summary { background: var(--primary); color: var(--bg-white); padding: 10px 15px; font-size: 1.1em; cursor: pointer; }
+    .section-details[open] summary { background: #3a0077; }
+    table { width: 100%; border-collapse: collapse; margin: 0; table-layout: fixed; }
+    th, td { border: 1px solid var(--gray); padding: 10px; vertical-align: top; font-size: 0.95em; }
+    th { background: var(--gray); text-align: left; }
+    tbody tr:nth-child(even) { background: #fbfbfb; }
+    .item-col { width: 25%; font-weight: bold; color: var(--primary); }
+    .comment-col { width: 55%; }
+    .ok-col {
+      width: 240px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    textarea { width: 100%; min-height: 3em; border: 1px solid var(--gray); border-radius: 4px; padding: 8px; resize: vertical; font-family: inherit; }
+    .char-count { font-size: .75em; color: var(--text); text-align: right; margin-top: 4px; }
+    .ok-options { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .ok-options label { cursor: pointer; }
+    .ok-options input { display: none; }
+    .ok-options span {
+      display: inline-block;
+      padding: 6px 10px;
+      border: 1px solid var(--primary);
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+      color: var(--primary);
+      font-size: 0.9em;
+      min-width: 60px;
       text-align: center;
     }
-
-    @media print {
-      body { padding: 0; }
-      .header { display: none; }
-      .card { box-shadow: none; margin: 0; border-radius: 0; }
-    }
+    .ok-options input:checked + span { background: var(--primary); color: var(--bg-white); }
+    .signatures { margin-top: 60px; display: flex; justify-content: center; gap: 60px; }
+    .signature-line { width: 40%; border-top: 2px dashed var(--gray); padding-top: 80px; font-weight: bold; color: var(--primary); text-align: center; }
+    @media print { body { padding: 0; } header { display: none; } .card { box-shadow: none; margin: 0; border-radius: 0; } }
   </style>
 </head>
 <body>
-  <div class="header">
-    <img src="accessone_logo.png" alt="AccessOne Logo">
-    <h1>Check List de Estacionamientos</h1>
-  </div>
-  <div class="card">
-    <div class="form-header">
-      <label>Proyecto:<input type="text" id="project"></label>
-      <label>Fecha:<input type="date" id="date"></label>
-      <label>Gerente:<input type="text" id="manager"></label>
-    </div>
-    <div id="progressContainer"><div id="progressBar"></div></div>
-    <div id="totalCalif">Calificación Total: <span id="totalValue">0</span>%</div>
-    <div id="sections"></div>
-    <div class="signatures">
-      <div class="signature-line">Gerente de Proyecto</div>
-      <div class="signature-line">Firma Gerente Zonal o Jr</div>
+  <div class="container">
+    <header>
+      <img src="logo (1).png" alt="AccessOne Logo">
+      <h1>Check List de Estacionamientos</h1>
+    </header>
+    <div class="card">
+      <div class="form-header">
+        <label>Proyecto:<input type="text" id="project"></label>
+        <label>Fecha:<input type="date" id="date"></label>
+        <label>Gerente:<input type="text" id="manager"></label>
+      </div>
+      <div id="progressContainer"><div id="progressBar"></div></div>
+      <div id="totalCalif">Calificación Total:<span id="totalValue">0</span>%</div>
+      <div id="sections"></div>
+      <div class="signatures">
+        <div class="signature-line">Gerente de Proyecto</div>
+        <div class="signature-line">Firma Gerente Zonal o Jr</div>
+      </div>
     </div>
   </div>
   <script>
-    const separators = [6,15,29,35,40,45,52,61,70,77,84];
     const negativeItems = [4,5,10,23,38,39,41,42,43,44,46,47,48,49,51,79,81];
     const items = [
       "Cuenta con (Licencia, Permiso Funcionamiento)",
@@ -92,6 +136,7 @@
       "El estacionamiento cuenta con encargado(s) o responsable? (Por turno, Por estacionamiento)",
       "La plantilla de cajeros y/o auxiliares completa? (Matutino, Vespertino, Nocturno)",
       "Numero de quejas recibidas en estos 30 dias?",
+      "El personal cuenta con las siguientes caracteristicas (Uniforme Completo y en buen estado, Gafete de Identificacion)",
       "El personal conoce y aplica el plan de contingencia?",
       "Cuenta con directorio de servicio de emergencia actualizado?",
       "-- Operación: Equipos --",
@@ -99,6 +144,7 @@
       "Emisor de boletos por cada entrada y funcionando?",
       "Funcionan todos los cajeros de pago?",
       "Validadora (receptora) y TPV en cada salida y funcionando?",
+      "Entradas con dispensador de gel funcionando?",
       "Se cuenta con interfonia en el estacionamiento?",
       "Cuenta con CCTV y funciona correctamente?",
       "Se realiza mantenimiento de UPS / tiene alguna falla?",
@@ -143,9 +189,8 @@
       "El personal de limpieza cuenta con uniforme completo y gafete a la vista?",
       "Estacionamiento limpio en general?",
       "Se realiza desengrasado de cajones de estacionamiento?",
-      "El personal cuenta con equipo de proteccion? (Cubrebocas, Careta/Lentes)",
       "Cuenta con el material para realizar la limpieza y sanitizacion en oficina, equipos de estacionamiento?",
-      "Cuenta con liquido desengrasante para la limpieza de cajones?",
+      "Cuenta con liquido desengrasante para la limpieza de cajons?",
       "-- PROTECCION CIVIL --",
       "El estacionamiento cuenta con extintores?",
       "Los extintores estan vigentes? (Fecha de vigencia: Concesionario/PV, Extintores Tienda)",
@@ -157,7 +202,7 @@
       "Los boletos se encuentran ordenados por dia?",
       "Existen diferencias del boletaje fisico vs reporte?",
       "Existe control de ingreso diario?",
-      "Existen diferencias entre el deposito realizado vs reportes de ingresos?",
+      "Existen diferencias entre el deposito realicorn vs reportes de ingresos?",
       "Se lleva un control del total de pensiones? (Numero de pensiones, Costo de pension)",
       "Se lleva un control de tarjetas de proximidad y/o cortesias? (Promedio diario de Cortesias)",
       "-- PENSIONES --",
@@ -166,87 +211,52 @@
       "Se utilizan los candados adecuadamente?",
       "Tienes inventario?"
     ];
-    const evaluableCount = items.filter((l,i) => !separators.includes(i+1) && !l.startsWith('--')).length;
-    const weight = 100 / evaluableCount;
     function createSections() {
       const container = document.getElementById('sections');
       let sections = [], current = { title: 'General', items: [] };
       items.forEach((label, idx) => {
-        const num = idx + 1;
-        if (separators.includes(num) || label.startsWith('--')) {
+        if (label.startsWith('--')) {
           if (current.items.length) sections.push(current);
           current = { title: label.replace(/^--\s*/, ''), items: [] };
         } else {
-          current.items.push({ label, idx: num });
+          current.items.push({ label, idx: idx + 1 });
         }
       });
       sections.push(current);
       sections.forEach(sec => {
-        const details = document.createElement('details');
-        details.open = true;
-        details.className = 'section-details';
-        const summary = document.createElement('summary');
-        summary.textContent = sec.title;
-        details.appendChild(summary);
-        const table = document.createElement('table');
-        table.innerHTML = `
-          <thead>
-            <tr><th class="item-col">Ítem</th><th class="comment-col">Comentario</th><th class="ok-col">OK / N/A</th></tr>
-          </thead>
-          <tbody>
-            ${sec.items.map(it => `
-              <tr>
-                <td class="item-col">${it.idx}. ${it.label}</td>
-                <td class="comment-col">
-                  <textarea name="coment${it.idx}" maxlength="200"></textarea>
-                  <div class="char-count">0/200</div>
-                </td>
-                <td class="ok-col ok-options">
-                  ${['Sí','No Aplica','No'].map(v => `<label><input type="radio" name="ok${it.idx}" value="${v}" onchange="updateTotal()"/> ${v}</label>`).join('')}
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>`;
-        details.appendChild(table);
-        container.appendChild(details);
+        const d = document.createElement('details'); d.open = true; d.className = 'section-details';
+        const s = document.createElement('summary'); s.textContent = sec.title; d.appendChild(s);
+        const t = document.createElement('table');
+        t.innerHTML = `<thead><tr><th class="item-col">Ítem</th><th class="comment-col">Comentario</th><th class="ok-col">OK / N/A</th></tr></thead><tbody>${sec.items.map(it => `<tr><td class="item-col">${it.idx}. ${it.label}</td><td class="comment-col"><textarea name="coment${it.idx}" maxlength="200"></textarea><div class="char-count">0/200</div></td><td class="ok-col ok-options">${['Sí','No','No Aplica'].map(v => `<label><input type="radio" name="ok${it.idx}" value="${v}" onchange="updateTotal()"/><span>${v}</span></label>`).join('')}}</td></tr>`).join('')}</tbody>`;
+        d.appendChild(t); container.appendChild(d);
       });
-      document.querySelectorAll('textarea').forEach(ta =>
-        ta.addEventListener('input', e => e.target.nextElementSibling.textContent = `${e.target.value.length}/200`)
-      );
+      document.querySelectorAll('textarea').forEach(ta => ta.addEventListener('input', e => e.target.nextElementSibling.textContent = `${e.target.value.length}/200`));
       updateTotal();
     }
     function updateTotal() {
       let sum = 0;
+      const evaluableCount = items.filter(l => !l.startsWith('--')).length;
+      const weight = 100 / evaluableCount;
       items.forEach((l, i) => {
-        const num = i + 1;
-        if (!separators.includes(num) && !l.startsWith('--')) {
+        if (!l.startsWith('--')) {
+          const num = i + 1;
           const sel = document.querySelector(`input[name="ok${num}"]:checked`);
           const val = sel ? sel.value : null;
           if (negativeItems.includes(num)) {
-            if (val === 'Sí') {
-              sum -= weight;
-            } else if (val === 'No Aplica' || val === 'No') {
-              sum += weight;
-            }
-            // si no hay selección, no sumar ni restar
-          } else {
-            if (val === 'Sí' || val === 'No Aplica') {
-              sum += weight;
-            }
-            // val null o 'No' no suma
-          }
+            if (val === 'Sí') sum -= weight;
+            else if (val === 'No Aplica' || val === 'No') sum += weight;
+          } else if (val === 'Sí' || val === 'No Aplica') sum += weight;
         }
       });
       const total = Math.max(0, Math.min(100, sum));
       const span = document.getElementById('totalValue');
       span.textContent = total.toFixed(2);
-      if (total >= 90) span.style.color = 'green';
-      else if (total >= 85) span.style.color = 'var(--yellow)';
-      else span.style.color = 'red';
+      span.style.color = total >= 90 ? 'green' : total >= 85 ? 'var(--secondary)' : 'red';
       document.getElementById('progressBar').style.width = `${total}%`;
     }
-    window.addEventListener('DOMContentLoaded', createSections);('DOMContentLoaded', createSections);
+    window.addEventListener('DOMContentLoaded', createSections);
   </script>
 </body>
 </html>
+
 
