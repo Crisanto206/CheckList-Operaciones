@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Check List Estacionamientos - AccessOne</title>
+  <!-- jsPDF from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root { --purple: #2E0060; --yellow: #FFD400; --gray-light: #f9f9f9; --gray-medium: #e0e0e0; --gray-dark: #ccc; }
+    body { background: var(--gray-light); font-family: Arial, sans-serif; margin:0; padding:20px; }
+    .header { display:flex; align-items:center; background:var(--purple); color:white; padding:10px 20px; border-radius:8px; margin-bottom:20px; }
+    .header img { height:40px; margin-right:15px; }
+    .header h1 { font-size:1.5em; margin:0; }
+    .card { background:white; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:20px; }
+    .form-header { display:flex; justify-content:space-between; margin-bottom:15px; }
+    .form-header label { font-weight:bold; color:var(--purple); }
+    .form-header input { border:1px solid var(--gray-dark); border-radius:4px; padding:4px; margin-left:8px; }
+    #progressContainer { background:var(--gray-medium); border-radius:4px; overflow:hidden; margin-bottom:10px; height:12px; }
+    #progressBar { height:100%; width:0%; background:var(--yellow); transition:width .3s; }
+    #totalCalif { font-size:1.1em; margin-bottom:15px; color:var(--purple); }
+    .section-details { margin-bottom:20px; border:1px solid var(--gray-medium); border-radius:4px; overflow:hidden; }
+    .section-details summary { background:var(--gray-medium); padding:8px; font-size:1.1em; font-weight:bold; cursor:pointer; color:var(--purple); }
+    table { width:100%; border-collapse:collapse; margin:0; }
+    th, td { border:1px solid var(--gray-dark); padding:8px; vertical-align:top; }
+    th { background:var(--gray-light); text-align:left; }
+    .item-col { width:30%; font-weight:bold; color:var(--purple); }
+    .comment-col { width:50%; }
+    textarea { width:100%; min-height:3em; border:1px solid var(--gray-dark); border-radius:4px; padding:6px; resize:vertical; }
+    .char-count { font-size:.8em; color:var(--gray-dark); text-align:right; margin-top:2px; }
+    .ok-col { width:20%; text-align:center; }
+    .ok-options label { margin:0 5px; cursor:pointer; }
+    .ok-options input { transform:scale(1.2); margin-right:4px; vertical-align:middle; }
+    .actions { margin-top:15px; }
+    .actions button { margin-right:10px; background:var(--yellow); border:none; color:var(--purple); padding:8px 16px; font-size:1em; border-radius:4px; cursor:pointer; }
+    .actions button:hover { background:#fbe55f; }
+    .signatures { margin-top:30px; display:flex; justify-content:space-between; }
+    .signature-line { width:32%; border-top:1px solid var(--gray-dark); padding-top:8px; font-weight:bold; color:var(--purple); }
+    @media print { body{padding:0;} .header, .actions{display:none;} .card{box-shadow:none; margin:0; border-radius:0;} .section-details{page-break-after:always;} }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="accessone_logo.png" alt="AccessOne Logo">
+    <h1>Check List de Estacionamientos</h1>
+  </div>
+  <div class="card">
+    <div class="form-header">
+      <label>Proyecto:<input type="text" id="project"></label>
+      <label>Fecha:<input type="date" id="date"></label>
+      <label>Gerente:<input type="text" id="manager"></label>
+    </div>
+    <div id="progressContainer"><div id="progressBar"></div></div>
+    <div id="totalCalif">Calificación Total: <span id="totalValue">0</span>%</div>
+    <div id="sections"></div>
+    <div class="actions">
+      <button id="exportCsv">Exportar CSV</button>
+      <button id="exportPdf">Exportar PDF</button>
+    </div>
+    <div class="signatures">
+      <div class="signature-line">Gerente de Proyecto</div>
+      <div class="signature-line">Firma</div>
+      <div class="signature-line">Fecha</div>
+    </div>
+  </div>
+  <script>
+    const separators=[6,15,29,35,40,45,52,61,70,77,84];
+    const negativeItems=[4,5,10,23,38,39,41,42,43,44,46,47,48,49,51,79,81];
+    const items=[
+      "Cuenta con (Licencia, Permiso Funcionamiento)",
+      "Cuenta con Poliza de Seguro Vigente? (Vehiculos, Motocicletas)",
+      "Cuenta con hologramas de PROFECO vigentes en cada equipo? (Emisoras, Receptora, Cajeros de pago, TPV/Reloj Checador)",
+      "¿Ha tenido algun robo total? (auto, camioneta, motocicleta)",
+      "¿Ha tenido algun robo parcial? (auto, camioneta, motocicleta)",
+      "-- OPERACIÓN: Personal de Operación --",
+      "El Supervisor de zona realiza el checklist una vez al mes?",
+      "El estacionamiento cuenta con encargado(s) o responsable? (Por turno, Por estacionamiento)",
+      "La plantilla de cajeros y/o auxiliares completa? (Matutino, Vespertino, Nocturno)",
+      "Numero de quejas recibidas en estos 30 dias?",
+      "El personal cuenta con las siguientes caracteristicas (Uniforme Completo y en buen estado, Gafete de Identificacion)",
+      "El personal conoce y aplica el plan de contingencia?",
+      "Cuenta con directorio de servicio de emergencia actualizado?",
+      "El personal cuenta con equipo de proteccion? (Cubrebocas, Careta/Lentes)",
+      "-- Operación: Equipos --",
+      "Todas las entradas y salidas abiertas? (Automatico, Push Boton, Por Sensor)",
+      "Emisor de boletos por cada entrada y funcionando?",
+      "Funcionan todos los cajeros de pago?",
+      "Validadora (receptora) y TPV en cada salida y funcionando?",
+      "Entradas con dispensador de gel funcionando?",
+      "Se cuenta con interfonia en el estacionamiento?",
+      "Cuenta con CCTV y funciona correctamente?",
+      "Se realiza mantenimiento de UPS / tiene alguna falla?",
+      "Las casetas se encuentran en servicio dentro del horario de la tienda?",
+      "Las casetas se encuentran en buenas condiciones? (Vidrios, Pintura, Cerrajeria, Rotulos/Señalizacion, Iluminacion, Mobiliario, Limpieza/Sanitizacion)",
+      "Imagen de los equipos (Hojalateria, Pintura, Limpieza, Anclaje correcto, Cerrados en general)",
+      "Cuentan con radios de comunicacion y funcionando?",
+      "Cuenta con relojes checadores y funcionando?",
+      "-- Operación: Oficina Administrativa --",
+      "Oficina Administrativa en buenas condiciones? (Vidrios, Pintura, Cerrajeria, Rotulos/Señalizacion, Iluminacion, Mobiliario)",
+      "Cuenta con bitacora de novedades del concesionario?",
+      "Cuenta con catalogo de firmas actualizado de gerencias?",
+      "Cuenta con Kit de auxilio vial? (Gato hidraulico, Llave de cruz, Arrancador/bateria, Herramienta basica)",
+      "Los totems y senalamientos cuentan con la informacion completa, actualizada y en buenas condiciones?",
+      "-- MANTENIMIENTO: Equipos --",
+      "Se realiza el mantenimiento preventivo de equipos?",
+      "-- Mantenimiento: Bacheo Menor --",
+      "El estacionamiento presenta baches?",
+      "Los registros se encuentran en buen estado?",
+      "-- Mantenimiento: Pintura --",
+      "Se ejecuta el plan de pintura de acuerdo al calendario?",
+      "La pintura en cajones se encuentra en buenas condiciones? (Normal, discapacitados. Rosas)",
+      "La pintura en flechas de circulacion se encuentran en buenas condiciones?",
+      "La pintura en puntos de reunion, guarniciones y topes se encuentran en buenas condiciones?",
+      "-- Mantenimiento: Jardineria --",
+      "Se realiza poda de pasto y setos?",
+      "Faltan plantas y arboles en jardineras?",
+      "Los troncos de los arboles estan encalados?",
+      "Se realiza el riego periodicamente?",
+      "-- Mantenimiento: Iluminacion --",
+      "Existen lamparas fundidas?",
+      "-- VIGILANCIA: Personal de Seguridad --",
+      "Se encuentra completa la plantilla de Vigilancia de acuerdo a la necesidad de la operacion?",
+      "Estan uniformados los vigilantes del estacionamiento?",
+      "Se diferencia el personal de vigilancia con el personal operativo?",
+      "El personal cuenta con gafete de identificacion a la vista?",
+      "El personal de vigilancia realiza los rondines en el estacionamiento?",
+      "El personal cuenta con equipo de proteccion? (Cubrebocas, Careta/Lentes)",
+      "Cuentan con radios de intercomunicacion?",
+      "Cuentan con bitacora de novedades y se encuentra al dia?",
+      "-- LIMPIEZA: Personal de Limpieza --",
+      "Cuenta con personal de limpieza suficiente para la operacion? (Matutino, Vespertino, Total por dia)",
+      "El personal de limpieza cuenta con uniforme completo y gafete a la vista?",
+      "Estacionamiento limpio en general?",
+      "Se realiza desengrasado de cajones de estacionamiento?",
+      "Limpieza en equipo de proteccion civil?",
+      "El personal cuenta con equipo de proteccion? (Cubrebocas, Careta/Lentes)",
+      "Cuenta con el material para realizar la limpieza y sanitizacion en oficina, equipos de estacionamiento?",
+      "Cuenta con liquido desengrasante para la limpieza de cajones?",
+      "-- PROTECCION CIVIL --",
+      "El estacionamiento cuenta con extintores?",
+      "Los extintores estan vigentes? (Fecha de vigencia, Concesionario/PV, Extintores Tienda)",
+      "Gabinetes de Extintores en buenas condiciones? (Casco/Botas/Guantes, Chamarra/Pantalon, Palas/Rotulos/Megafono)",
+      "El estacionamiento cuenta con botes areneros en buenas condiciones? (Bolsas, Palas, Num. de botes areneros)",
+      "Cuenta con senalizacion de ubicacion de equipo de proteccion civil y rutas de evacuacion en buen estado?",
+      "Cuentan con botiquin de primeros auxilios con el material necesario y completo?",
+      "-- AREA ADMINISTRATIVA --",
+      "Los boletos se encuentran ordenados por dia?",
+      "Existen diferencias del boletaje fisico vs reporte?",
+      "Existe control de ingreso diario?",
+      "Existen diferencias entre el deposito realizado vs reportes de ingresos?",
+      "Se lleva un control del total de pensiones? (Numero de pensiones, Costo de pension)",
+      "Se lleva un control de tarjetas de proximidad y/o cortesias? (Promedio diario de Cortesias)",
+      "-- PENSIONES --",
+      "Cuentas con pensiones?",
+      "Contratos completos?",
+      "Se utilizan los candados adecuadamente?",
+      "Tienes inventario?"
+    ];
+    const evaluableCount=items.filter((l,i)=>!separators.includes(i+1)&&!l.startsWith('--')).length;
+    const weight=100/evaluableCount;
+    function createSections(){
+      const container=document.getElementById('sections');
+      let sections=[], current={title:'General',items:[]};
+      items.forEach((label,idx)=>{
+        const num=idx+1;
+        if(separators.includes(num)||label.startsWith('--')){
+          if(current.items.length) sections.push(current);
+          current={title:label.replace(/^--\s*/,''),items:[]};
+        } else current.items.push({label,idx:num});
+      });
+      sections.push(current);
+      sections.forEach(sec=>{
+        const details=document.createElement('details'); details.open=true; details.className='section-details';
+        const summary=document.createElement('summary'); summary.textContent=sec.title; details.appendChild(summary);
+        const table=document.createElement('table');
+        table.innerHTML=`
+          <thead>
+            <tr><th class="item-col">Ítem</th><th class="comment-col">Comentario</th><th class="ok-col">OK / N/A</th></tr>
+          </thead>
+          <tbody>
+            ${sec.items.map(it=>`
+              <tr>
+                <td class="item-col">${it.idx}. ${it.label}</td>
+                <td class="comment-col">
+                  <textarea name="coment${it.idx}" placeholder="Ingresa comentario..." maxlength="200"></textarea>
+                  <div class="char-count">0/200</div>
+                </td>
+                <td class="ok-col ok-options">
+                  ${['Sí','No Aplica','No'].map(val=>`<label><input type="radio" name="ok${it.idx}" value="${val}" onchange="updateTotal()"/> ${val}</label>`).join('')}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>`;
+        details.appendChild(table);
+        container.appendChild(details);
+      });
+      document.querySelectorAll('textarea').forEach(ta=>
+        ta.addEventListener('input',e=>e.target.nextElementSibling.textContent=`${e.target.value.length}/200`)
+      );
+      updateTotal();
+    }
+    function updateTotal(){
+      let sum=0;
+      items.forEach((l,i)=>{
+        const num=i+1;
+        if(!separators.includes(num)&&!l.startsWith('--')){
+          const sel=document.querySelector(`input[name="ok${num}"]:checked`);
+          const val=sel?sel.value:null;
+          if(negativeItems.includes(num)){
+            if(val==='Sí') sum-=weight;
+            else if(val!=='Sí') sum+=weight;
+          } else if(val==='Sí'||val==='No Aplica') sum+=weight;
+        }
+      });
+      const total=Math.max(0,Math.min(100,sum));
+      document.getElementById('totalValue').textContent=total.toFixed(2);
+      document.getElementById('progressBar').style.width=`${total}%`;
+    }
+    function exportCsv(){
+      let csv=[`Proyecto: ${document.getElementById('project').value}`,`Fecha: ${document.getElementById('date').value}`,`Gerente: ${document.getElementById('manager').value}`,'Ítem,Comentario,OK'];
+      items.forEach((l,i)=>{
+        const num=i+1;
+        if(!separators.includes(num)&&!l.startsWith('--')){
+          const comment=document.querySelector(`textarea[name="coment${num}"]`).value.replace(/"/g,'""');
+          const ok=(document.querySelector(`input[name="ok${num}"]:checked`)||{}).value||'';
+          csv.push(`"${num}. ${l}","${comment}","${ok}"`);
+        }
+      });
+      const blob=new Blob([csv.join('\n')],{type:'text/csv;charset=utf-8;'});
+      const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download='checklist.csv'; link.click();
+    }
+    function exportPdf(){
+      const { jsPDF }=window.jspdf;
+      const doc=new jsPDF({unit:'pt',format:'letter'});
+      doc.html(document.querySelector('.card'),{
+        callback:pdf=>pdf.save('checklist.pdf'),
+        margin:[20,20,20,20],
+        x:0,y:0,
+        width:doc.internal.pageSize.getWidth()-40
+      });
+    }
+    window.addEventListener('DOMContentLoaded',()=>{
+      createSections();
+      document.getElementById('exportCsv').addEventListener('click',exportCsv);
+      document.getElementById('exportPdf').addEventListener('click',exportPdf);
+    });
+  </script>
+</body>
+</html>
