@@ -141,16 +141,17 @@
     // Patrones de preguntas negativas (responder "Sí" penaliza)
     // Patrones de preguntas negativas (responder "Sí" penaliza)
     const negativeLabels = [
-      /robo total/i,
-      /robo parcial/i,
-      /quejas recibidas/i,
-      /presenta baches/i,
-      /lamparas fundidas/i,
-      /diferencias.*boletaje/i,
-      /diferencias.*deposito/i,
-      /faltan plantas/i,
-      /tiene alguna falla/i
-    ];
+  /robo total/i,
+  /robo parcial/i,
+  /quejas recibidas/i,
+  /presenta baches/i,
+  /lamparas fundidas/i,
+  /diferencias.*boletaje/i,
+  /diferencias.*dep[oó]sito/i,     // ahora incluye "depósito"
+  /faltan plantas/i,
+  /tiene alguna falla/i
+];
+
     const items = [
       "Cuenta con (Licencia, Permiso Funcionamiento)",
       "Cuenta con Póliza de Seguro Vigente? (Vehículos, Motocicletas)",
