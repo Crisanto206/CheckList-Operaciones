@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Check List Estacionamientos - AccessOne</title>
+  <title>Check List de Estacionamientos</title>
   <style>
     /* Colores corporativos */
     :root {
@@ -49,6 +49,7 @@
       gap: 20px;
       flex-wrap: wrap;
       margin-bottom: 20px;
+      align-items: flex-end;
     }
     .form-header label {
       flex: 1;
@@ -63,8 +64,32 @@
       padding: 6px 10px;
       margin-top: 5px;
     }
-    #progressContainer { background: var(--gray); border-radius: 4px; overflow: hidden; margin-bottom: 15px; height: 14px; }
-    #progressBar { height: 100%; width: 0%; background: var(--secondary); transition: width 0.4s ease; }
+    .form-header button {
+      background: var(--primary);
+      color: var(--bg-white);
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    .form-header button:hover {
+      background: #3a0077;
+    }
+    #progressContainer {
+      background: var(--gray);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 15px;
+      height: 14px;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background: var(--secondary);
+      transition: width 0.4s ease;
+    }
     /* Sticky score header */
     .sticky-score {
       position: sticky;
@@ -74,28 +99,104 @@
       padding-bottom: 10px;
       z-index: 100;
     }
-    #progressBar { height: 100%; width: 0%; background: var(--secondary); transition: width 0.4s ease; }
-    #totalCalif { font-size: 1.2em; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-    #totalValue { font-weight: bold; font-size: 1.5em; }
-    .section-details { margin-bottom: 15px; border: 1px solid var(--gray); border-radius: 6px; overflow: hidden; }
-    .section-details summary { background: var(--primary); color: var(--bg-white); padding: 10px 15px; font-size: 1.1em; cursor: pointer; }
-    .section-details[open] summary { background: #3a0077; }
-    table { width: 100%; border-collapse: collapse; margin: 0; table-layout: fixed; }
-    th, td { border: 1px solid var(--gray); padding: 10px; vertical-align: top; font-size: 0.95em; }
-    th { background: var(--gray); text-align: left; }
-    tbody tr:nth-child(even) { background: #fbfbfb; }
-    .item-col { width: 25%; font-weight: bold; color: var(--primary); }
-    .comment-col { width: 55%; }
+    #totalCalif {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    #totalValue {
+      font-weight: bold;
+      font-size: 1.5em;
+      min-width: 60px;
+      text-align: right;
+    }
+    #gaugeContainer {
+      position: relative;
+      width: 120px;
+      height: 60px;
+    }
+    #gauge {
+      width: 120px;
+      height: 60px;
+    }
+    .section-details {
+      margin-bottom: 15px;
+      border: 1px solid var(--gray);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .section-details summary {
+      background: var(--primary);
+      color: var(--bg-white);
+      padding: 10px 15px;
+      font-size: 1.1em;
+      cursor: pointer;
+    }
+    .section-details[open] summary {
+      background: #3a0077;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+      table-layout: fixed;
+    }
+    th, td {
+      border: 1px solid var(--gray);
+      padding: 10px;
+      vertical-align: top;
+      font-size: 0.95em;
+    }
+    th {
+      background: var(--gray);
+      text-align: left;
+    }
+    tbody tr:nth-child(even) {
+      background: #fbfbfb;
+    }
+    .item-col {
+      width: 25%;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    .comment-col {
+      width: 55%;
+    }
     .ok-col {
       width: 240px;
       text-align: center;
       white-space: nowrap;
     }
-    textarea { width: 100%; min-height: 3em; border: 1px solid var(--gray); border-radius: 4px; padding: 8px; resize: vertical; font-family: inherit; }
-    .char-count { font-size: .75em; color: var(--text); text-align: right; margin-top: 4px; }
-    .ok-options { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .ok-options label { cursor: pointer; }
-    .ok-options input { display: none; }
+    textarea {
+      width: 100%;
+      min-height: 3em;
+      border: 1px solid var(--gray);
+      border-radius: 4px;
+      padding: 8px;
+      resize: vertical;
+      font-family: inherit;
+      margin-top: 8px;
+    }
+    .char-count {
+      font-size: .75em;
+      color: var(--text);
+      text-align: right;
+      margin-top: 4px;
+    }
+    .ok-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .ok-options label {
+      cursor: pointer;
+    }
+    .ok-options input {
+      display: none;
+    }
     .ok-options span {
       display: inline-block;
       padding: 6px 10px;
@@ -107,10 +208,52 @@
       min-width: 60px;
       text-align: center;
     }
-    .ok-options input:checked + span { background: var(--primary); color: var(--bg-white); }
-    .signatures { margin-top: 60px; display: flex; justify-content: center; gap: 60px; }
-    .signature-line { width: 40%; border-top: 2px dashed var(--gray); padding-top: 80px; font-weight: bold; color: var(--primary); text-align: center; }
-    @media print { body { padding: 0; } header { display: none; } .card { box-shadow: none; margin: 0; border-radius: 0; } }
+    .ok-options input:checked + span {
+      background: var(--primary);
+      color: var(--bg-white);
+    }
+    .lamp-row input {
+      width: 70px;
+      margin-right: 10px;
+      padding: 4px 6px;
+      border: 1px solid var(--gray);
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+    .lamp-label {
+      font-weight: bold;
+      margin-right: 6px;
+      font-size: 0.95em;
+    }
+    .lamp-percentage {
+      font-weight: bold;
+      font-size: 1em;
+      margin-left: 10px;
+      color: var(--primary);
+    }
+    .signatures {
+      margin-top: 60px;
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+    }
+    .signature-line {
+      width: 40%;
+      border-top: 2px dashed var(--gray);
+      padding-top: 80px;
+      font-weight: bold;
+      color: var(--primary);
+      text-align: center;
+    }
+    @media print {
+      body { padding: 0; }
+      header { display: none; }
+      .card {
+        box-shadow: none;
+        margin: 0;
+        border-radius: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -121,13 +264,81 @@
     </header>
     <div class="card">
       <div class="form-header">
-        <label>Proyecto:<input type="text" id="project"></label>
-        <label>Fecha:<input type="date" id="date"></label>
-        <label>Gerente:<input type="text" id="manager"></label>
+        <label>
+          Proyecto:
+          <input type="text" id="project" list="projectList" placeholder="Escribe para filtrar...">
+        </label>
+        <button id="searchBtn">Buscar</button>
+        <label>
+          Fecha:
+          <input type="date" id="date">
+        </label>
+        <label>
+          Gerente:
+          <input type="text" id="manager" readonly>
+        </label>
       </div>
+
+      <!-- Lista para autocomplete de "Proyecto" -->
+      <datalist id="projectList">
+        <option value="Adagio">
+        <option value="Boulevard 5 de mayo">
+        <option value="Buenavista">
+        <option value="Centenario">
+        <option value="Combo Aeropuerto">
+        <option value="Combo Azcapotzalco">
+        <option value="Combo Carrizal">
+        <option value="Combo Cuautitlán">
+        <option value="Combo Satélite">
+        <option value="Comitán">
+        <option value="Cuautitlán 1ero de mayo">
+        <option value="Dorada I Dorada II">
+        <option value="Galerías VHS">
+        <option value="Hermosillo">
+        <option value="Insurgentes Nte.">
+        <option value="Kómplex">
+        <option value="La Raza">
+        <option value="León">
+        <option value="Tijuana">
+        <option value="Macroplaza Insurgentes Tijuana">
+        <option value="Moroleon">
+        <option value="Paroli">
+        <option value="Patio Pedregal">
+        <option value="Portal Churubusco">
+        <option value="San Manuel">
+        <option value="Símbolos Patrios">
+        <option value="Suburbia">
+        <option value="Tacámbaro">
+        <option value="Tapachula">
+        <option value="Tepeyac">
+        <option value="Tlalpan">
+        <option value="Tlaxcala">
+        <option value="Uruapan">
+        <option value="Vía San Ángel">
+        <option value="Zitácuaro">
+        <option value="Playa del Carmen">
+        <option value="Paseo Akia">
+        <option value="WE Periferico">
+        <option value="Pirules">
+        <option value="La Mangana">
+        <option value="WE Horacio">
+        <option value="Tacubaya">
+        <option value="Mariano Escobedo">
+        <option value="Ferrocarril Hidalgo">
+        <option value="Sam´s Oaxaca">
+        <option value="Plaza Alamos">
+        <option value="San Pedrito">
+      </datalist>
+
       <div class="sticky-score">
+        <div id="totalCalif">
+          <span>Calificación:</span>
+          <span id="totalValue">0%</span>
+          <div id="gaugeContainer">
+            <canvas id="gauge" width="120" height="60"></canvas>
+          </div>
+        </div>
         <div id="progressContainer"><div id="progressBar"></div></div>
-        <div id="totalCalif">Calificación Total:<span id="totalValue">0</span>%</div>
       </div>
       <div id="sections"></div>
       <div class="signatures">
@@ -137,21 +348,71 @@
     </div>
   </div>
   <script>
-    // Patrones de preguntas negativas (responder "Sí" penaliza)
-    // Patrones de preguntas negativas (responder "Sí" penaliza)
+    // Mapeo de proyectos a gerentes
+    const projectManagerMap = {
+      "Adagio": "CARLOS BRUNO VALENCIA RAMÍREZ",
+      "Boulevard 5 de mayo": "CÁNDIDO FCO. RUBÉN BECERRIL MARAVILLAS",
+      "Buenavista": "DORIAN GUADALUPE NIETO VÁZQUEZ",
+      "Centenario": "ÁNGEL ELOY TRUJILLO SARABIA",
+      "Combo Aeropuerto": "DAVID BARRIOS PIÑA",
+      "Combo Azcapotzalco": "ISMAEL VENTURA",
+      "Combo Carrizal": "CALEB JAFHET MALDONADO MENDEZ",
+      "Combo Cuautitlán": "ESTEFABIA RUBIO",
+      "Combo Satélite": "JAQUELIN ALVARADO ALVARADO",
+      "Comitán": "GLADIS DEL ROSARIO MALDONADO RAMÍREZ",
+      "Cuautitlán 1ero de mayo": "EDWIN ISSAC HERNANDEZ RODRIGUEZ",
+      "Dorada I Dorada II": "RICARDO FABRE JUAREZ",
+      "Galerías VHS": "SIN ASIGNACION",
+      "Hermosillo": "HECTOR ISAAC COTA MEDINA",
+      "Insurgentes Nte.": "ZULEYMA GONZAGA CUEVAS",
+      "Kómplex": "SELENE ARIZBETH BONILLA HERNANDEZ",
+      "La Raza": "MARÍA ELENA HERNÁNDEZ GARCÍA",
+      "León": "LAURA PATRICIA MUJICA HERNANDEZ",
+      "Tijuana": "ELIAS RAMIREZ VARGAS",
+      "Macroplaza Insurgentes Tijuana": "JUAN JOSÉ LOPEZ CASTELLANOS",
+      "Moroleon": "MARIA ALEJANDRA NAVA OSORIO",
+      "Paroli": "FRANCISCO JAVIER RUBIO ISLAS",
+      "Patio Pedregal": "SIN ASIGNACION",
+      "Portal Churubusco": "MAYRA DELGADO PEÑA",
+      "San Manuel": "JACQUELINE RAMÍREZ SANDOVAL",
+      "Símbolos Patrios": "JESÚS MANUEL ZURITA PALACIOS",
+      "Suburbia": "JOSE EDUARDO GUTIERREZ ABURTO",
+      "Tacámbaro": "KISAI PALOMA BALLESTEROS VILLALOBOS",
+      "Tapachula": "RODRIGO VILLEGAS MOLINA",
+      "Tepeyac": "LESLIE MICHELLE AYALA RODRIGUEZ",
+      "Tlalpan": "IVÁN IBÁÑEZ RODRÍGUEZ",
+      "Tlaxcala": "ANGÉLICA PLAZA HERNÁNDEZ",
+      "Uruapan": "GIANFRANCO VALLADAREZ VALENCIA",
+      "Vía San Ángel": "RAUL MARTINEZ RUGERIO",
+      "Zitácuaro": "JULIO CESAR OROZCO ESQUIVEL",
+      "Playa del Carmen": "SIN ASIGNACION",
+      "Paseo Akia": "JOSE MANUEL PARDO ESQUIVEL",
+      "WE Periferico": "ALBERTO GONZALEZ CAMPUZANO",
+      "Pirules": "CRUZ GABRIELA HERNANDEZ AVILEZ",
+      "La Mangana": "MANUELA MORENO RAMIREZ",
+      "WE Horacio": "RICARDO DANIEL DIAZ URAGA",
+      "Tacubaya": "ALBERTO MARTIN LOPEZ DEL RAZO",
+      "Mariano Escobedo": "SIN ASIGNACION",
+      "Ferrocarril Hidalgo": "LESLIE MICHELLE AYALA RODRIGUEZ",
+      "Sam´s Oaxaca": "JULIO CÉSAR ZURITA PALACIOS",
+      "Plaza Alamos": "JUAN LOPEZ GARCIA",
+      "San Pedrito": "YARENI EMILY AHUMADA RUELAS"
+    };
+
     // Patrones de preguntas negativas (responder "Sí" penaliza)
     const negativeLabels = [
-  /robo total/i,
-  /robo parcial/i,
-  /quejas recibidas/i,
-  /presenta baches/i,
-  /lámparas fundidas/i,
-  /diferencias.*boletaje/i,
-  /diferencias.*dep[oó]sito/i,     // ahora incluye "depósito"
-  /faltan plantas/i,
-  /tiene alguna falla/i
-];
+      /robo total/i,
+      /robo parcial/i,
+      /quejas recibidas/i,
+      /presenta baches/i,
+      /lámparas fundidas/i,
+      /diferencias.*boletaje/i,
+      /diferencias.*dep[oó]sito/i,
+      /faltan plantas/i,
+      /tiene alguna falla/i
+    ];
 
+    // Lista de ítems completa (con modificaciones solicitadas)
     const items = [
       "Cuenta con (Licencia, Permiso Funcionamiento)",
       "Cuenta con Póliza de Seguro Vigente? (Vehículos, Motocicletas)",
@@ -163,6 +424,7 @@
       "El estacionamiento cuenta con encargado(s) o responsable? (Por turno, Por estaciónamiento)",
       "La plantilla de cajeros y/o auxiliares completa? (Matutino, Vespertino, Nocturno)",
       "Número de quejas recibidas en estos 30 días?",
+      "Desglosar quejas",                         // Ítem 11
       "El personal cuenta con las siguientes características (Uniforme Completo y en buen estado, Gafete de Identificación)",
       "El personal conoce y aplica el plan de contingencia?",
       "Cuenta con directorio de servicio de emergencia actualizado?",
@@ -174,6 +436,7 @@
       "Se cuenta con interfonía en el estacionamiento?",
       "Cuenta con CCTV y funciona correctamente?",
       "Se realiza mantenimiento de UPS / ¿tiene alguna falla?",
+      "Visita de técnico",
       "Las casetas se encuentran en servicio dentro del horario de la tienda?",
       "Las casetas se encuentran en buenas condiciones? (Vidrios, Pintura, Cerrajería, Rótulos/Señalización, Iluminación, Mobiliario, Limpieza/Sanitización)",
       "Imagen de los equipos (Hojalatería, Pintura, Limpieza, Anclaje correcto, Cerrados en general)",
@@ -182,16 +445,20 @@
       "-- Operación: Oficina Administrativa --",
       "Oficina Administrativa en buenas condiciones? (Vidrios, Pintura, Cerrajería, Rótulos/Señalización, Iluminación, Mobiliario)",
       "Cuenta con bitácora de novedades del concesionario?",
+      "Bitácora actualizada",
       "Cuenta con catálogo de firmas actualizado de gerencias?",
-      "Cuenta con Kit de auxilio vial? (Gato hidráulico, Llave de cruz, Arrancador/batería, Herramienta básica)",
+      "Cuenta con Kit de auxilio vial? (Gato hidráulico, Llave de cruz, Arrancador/batería, Herramienta básica) y el arrancador funciona?",
       "Los tótems y señalamientos cuentan con la información completa, actualizada y en buenas condiciones?",
+      "Requisiciones / Pendientes",               // Ítem 36
       "-- MANTENIMIENTO: Equipos --",
-      "Se realiza el mantenimiento preventivo de equipos?",
+      "Preventivo al mes",
+      "Equipos con buena imagen ?",
       "-- Mantenimiento: Bacheo Menor --",
       "El estacionamiento presenta baches?",
-      "Los registros se encuentran en buen estado?",
       "-- Mantenimiento: Pintura --",
       "Se ejecuta el plan de pintura de acuerdo al calendario?",
+      "Pintura (si no, ¿por qué?)",
+      "Guarniciones",
       "La pintura en cajones se encuentra en buenas condiciones? (Normal, discapacitados, Rosas)",
       "La pintura en flechas de circulación se encuentran en buenas condiciones?",
       "La pintura en puntos de reunión, guarniciones y topes se encuentran en buenas condiciones?",
@@ -202,6 +469,7 @@
       "Se realiza el riego periódicamente?",
       "-- Mantenimiento: Iluminación --",
       "Existen lámparas fundidas?",
+      "Lámparas porcentaje",
       "-- VIGILANCIA: Personal de Seguridad --",
       "Se encuentra completa la plantilla de Vigilancia de acuerdo a la necesidad de la operación?",
       "Están uniformados los vigilantes del estacionamiento?",
@@ -231,15 +499,19 @@
       "Existen diferencias entre el depósito realizado vs reportes de ingresos?",
       "Se lleva un control del total de pensiones? (Número de pensiones, Costo de pensión)",
       "Se lleva un control de tarjetas de proximidad y/o cortesías? (Promedio diario de Cortesías)",
+      "¿Los tickets están bien llenados?",
       "-- PENSIONES --",
       "Cuentas con pensiones?",
       "Contratos completos?",
       "Se utilizan los candados adecuadamente?",
       "Tienes inventario?"
     ];
+
+    // Función para generar las secciones dinámicamente
     function createSections() {
       const container = document.getElementById('sections');
       let sections = [], current = { title: 'General', items: [] };
+
       items.forEach((label, idx) => {
         if (label.startsWith('--')) {
           if (current.items.length) sections.push(current);
@@ -249,26 +521,170 @@
         }
       });
       sections.push(current);
+
       sections.forEach(sec => {
-        const d = document.createElement('details'); d.open = true; d.className = 'section-details';
-        const s = document.createElement('summary'); s.textContent = sec.title; d.appendChild(s);
+        const d = document.createElement('details');
+        d.open = true;
+        d.className = 'section-details';
+
+        const s = document.createElement('summary');
+        s.textContent = sec.title;
+        d.appendChild(s);
+
         const t = document.createElement('table');
-        t.innerHTML = `<thead><tr><th class="item-col">Ítem</th><th class="comment-col">Comentario</th><th class="ok-col">OK / N/A</th></tr></thead><tbody>${sec.items.map(it => `<tr><td class="item-col">${it.idx}. ${it.label}</td><td class="comment-col"><textarea name="coment${it.idx}" maxlength="200"></textarea><div class="char-count">0/200</div></td><td class="ok-col ok-options">${['Sí','No','No Aplica'].map(v => `<label><input type="radio" name="ok${it.idx}" value="${v}" onchange="updateTotal()"/><span>${v}</span></label>`).join('')}}</td></tr>`).join('')}</tbody>`;
-        d.appendChild(t); container.appendChild(d);
+        t.innerHTML = `
+          <thead>
+            <tr>
+              <th class="item-col">Ítem</th>
+              <th class="comment-col">Comentario / Datos</th>
+              <th class="ok-col">Resultado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sec.items.map(it => {
+              // Desglosar quejas (ítem 11) ahora igual que "Requisiciones / Pendientes"
+              if (it.label === 'Desglosar quejas') {
+                return `
+                  <tr>
+                    <td class="item-col">${it.idx}. ${it.label}</td>
+                    <td class="comment-col">
+                      <div>
+                        <label><input type="checkbox" name="dept${it.idx}" value="Obras"> Obras</label>
+                        <label><input type="checkbox" name="dept${it.idx}" value="Soporte"> Soporte</label>
+                        <label><input type="checkbox" name="dept${it.idx}" value="RH"> RH</label>
+                        <label><input type="checkbox" name="dept${it.idx}" value="Compras"> Compras</label>
+                      </div>
+                      <textarea name="tickets${it.idx}" maxlength="200" placeholder="Números de ticket..."></textarea>
+                      <div class="char-count">0/200</div>
+                    </td>
+                    <td class="ok-col ok-options">
+                      ${['Sí', 'No', 'No Aplica'].map(v => `
+                        <label>
+                          <input type="radio" name="ok${it.idx}" value="${v}" onchange="updateTotal()" />
+                          <span>${v}</span>
+                        </label>
+                      `).join('')}
+                    </td>
+                  </tr>
+                `;
+              }
+              // Lámparas porcentaje
+              else if (it.label === 'Lámparas porcentaje') {
+                return `
+                  <tr class="lamp-row">
+                    <td class="item-col">${it.idx}. ${it.label}</td>
+                    <td class="comment-col">
+                      <label class="lamp-label">Cuántas se tienen:</label>
+                      <input type="number" min="0" id="lamps-total" placeholder="0">
+                      <label class="lamp-label">Cuántas fundidas:</label>
+                      <input type="number" min="0" id="lamps-fundidas" placeholder="0">
+                    </td>
+                    <td class="ok-col">
+                      <span id="lamps-percentage" class="lamp-percentage">0%</span>
+                    </td>
+                  </tr>
+                `;
+              }
+              // Requisiciones / Pendientes (ítem 36)
+              else if (it.label === 'Requisiciones / Pendientes') {
+                return `
+                  <tr>
+                    <td class="item-col">${it.idx}. ${it.label}</td>
+                    <td class="comment-col">
+                      <div>
+                        <label><input type="checkbox" name="dept${it.idx}" value="Obras"> Obras</label>
+                        <label><input type="checkbox" name="dept${it.idx}" value="Soporte"> Soporte</label>
+                        <label><input type="checkbox" name="dept${it.idx}" value="RH"> RH</label>
+                        <label><input type="checkbox" name="dept${it.idx}" value="Compras"> Compras</label>
+                      </div>
+                      <textarea name="tickets${it.idx}" maxlength="200" placeholder="Números de ticket..."></textarea>
+                      <div class="char-count">0/200</div>
+                    </td>
+                    <td class="ok-col ok-options">
+                      ${['Sí', 'No', 'No Aplica'].map(v => `
+                        <label>
+                          <input type="radio" name="ok${it.idx}" value="${v}" onchange="updateTotal()" />
+                          <span>${v}</span>
+                        </label>
+                      `).join('')}
+                    </td>
+                  </tr>
+                `;
+              }
+              // Casos por defecto
+              else {
+                return `
+                  <tr>
+                    <td class="item-col">${it.idx}. ${it.label}</td>
+                    <td class="comment-col">
+                      <textarea name="coment${it.idx}" maxlength="200"></textarea>
+                      <div class="char-count">0/200</div>
+                    </td>
+                    <td class="ok-col ok-options">
+                      ${['Sí', 'No', 'No Aplica'].map(v => `
+                        <label>
+                          <input type="radio" name="ok${it.idx}" value="${v}" onchange="updateTotal()" />
+                          <span>${v}</span>
+                        </label>
+                      `).join('')}
+                    </td>
+                  </tr>
+                `;
+              }
+            }).join('')}
+          </tbody>
+        `;
+        d.appendChild(t);
+        container.appendChild(d);
       });
-      document.querySelectorAll('textarea').forEach(ta => ta.addEventListener('input', e => e.target.nextElementSibling.textContent = `${e.target.value.length}/200`));
+
+      // Contador de caracteres
+      document.querySelectorAll('textarea').forEach(ta => {
+        ta.addEventListener('input', e => {
+          e.target.nextElementSibling.textContent = `${e.target.value.length}/200`;
+        });
+      });
+
+      // Eventos para lámparas
+      const totalInput = document.getElementById('lamps-total');
+      const fundidasInput = document.getElementById('lamps-fundidas');
+      if (totalInput && fundidasInput) {
+        totalInput.addEventListener('input', calculateLampPercentage);
+        fundidasInput.addEventListener('input', calculateLampPercentage);
+      }
+
+      // Inicializar gauge
+      const gaugeCanvas = document.getElementById('gauge');
+      if (gaugeCanvas.getContext) {
+        window.ctx = gaugeCanvas.getContext('2d');
+        drawGauge(0);
+      }
+
       updateTotal();
     }
+
+    // Calcula porcentaje de lámparas fundidas
+    function calculateLampPercentage() {
+      const total = parseInt(document.getElementById('lamps-total').value, 10) || 0;
+      const fundidas = parseInt(document.getElementById('lamps-fundidas').value, 10) || 0;
+      let porcentaje = 0;
+      if (total > 0) porcentaje = Math.round((fundidas / total) * 100);
+      document.getElementById('lamps-percentage').textContent = porcentaje + '%';
+    }
+
+    // Actualiza calificación total y barra de progreso
     function updateTotal() {
       let sum = 0;
-      const evaluableCount = items.filter(l => !l.startsWith('--')).length;
+      const evaluableCount = items.filter(l => !l.startsWith('--') && l !== 'Lámparas porcentaje').length;
       const weight = 100 / evaluableCount;
+
       items.forEach((l, i) => {
-        if (!l.startsWith('--')) {
+        if (!l.startsWith('--') && l !== 'Lámparas porcentaje') {
           const num = i + 1;
           const sel = document.querySelector(`input[name="ok${num}"]:checked`);
           const val = sel ? sel.value : null;
           const isNegative = negativeLabels.some(rx => rx.test(l));
+
           if (isNegative) {
             if (val === 'Sí') sum -= weight;
             else if (val === 'No' || val === 'No Aplica') sum += weight;
@@ -277,13 +693,88 @@
           }
         }
       });
+
       const total = Math.max(0, Math.min(100, sum));
-      const span = document.getElementById('totalValue');
-      span.textContent = total.toFixed(2);
-      span.style.color = total >= 90 ? 'green' : total >= 85 ? 'var(--secondary)' : 'red';
+      document.getElementById('totalValue').textContent = total.toFixed(2) + '%';
       document.getElementById('progressBar').style.width = `${total}%`;
+      drawGauge(total);
     }
-    window.addEventListener('DOMContentLoaded', createSections);
+
+    // Dibuja el semicírculo y aguja en el gauge
+    function drawGauge(value) {
+      if (!window.ctx) return;
+      const ctx = window.ctx;
+      const centerX = 60;
+      const centerY = 60;
+      const radius = 60;
+
+      // Limpiar
+      ctx.clearRect(0, 0, 120, 60);
+
+      // Rojo (180°→120°)
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, Math.PI, Math.PI + Math.PI/3, false);
+      ctx.fillStyle = '#ff4d4d';
+      ctx.fill();
+
+      // Amarillo (120°→60°)
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, Math.PI + Math.PI/3, Math.PI + 2*Math.PI/3, false);
+      ctx.fillStyle = '#ffcc00';
+      ctx.fill();
+
+      // Verde (60°→0°)
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, Math.PI + 2*Math.PI/3, 2*Math.PI, false);
+      ctx.fillStyle = '#00cc44';
+      ctx.fill();
+
+      // Aguja (0% a la izquierda, 100% a la derecha)
+      const angle = Math.PI + (value / 100) * Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(centerX + (radius - 10) * Math.cos(angle), centerY + (radius - 10) * Math.sin(angle));
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#000';
+      ctx.stroke();
+
+      // Círculo central
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 5, 0, 2*Math.PI);
+      ctx.fillStyle = '#000';
+      ctx.fill();
+    }
+
+    // Función para asignar gerente al buscar proyecto
+    function assignManager() {
+      const projInput = document.getElementById('project').value.trim();
+      const managerInput = document.getElementById('manager');
+      if (projectManagerMap.hasOwnProperty(projInput)) {
+        managerInput.value = projectManagerMap[projInput];
+      } else {
+        managerInput.value = '';
+      }
+    }
+
+    // Al cargar la página, asignar fecha actual y generar secciones
+    window.addEventListener('DOMContentLoaded', () => {
+      // Asignar fecha de hoy en formato YYYY-MM-DD
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date').value = today;
+
+      // Asignar evento al botón Buscar
+      document.getElementById('searchBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        assignManager();
+      });
+
+      createSections();
+    });
   </script>
 </body>
+</html>
+
 </html>
